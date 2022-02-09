@@ -1,0 +1,120 @@
+ansibleIntegrationTest: &ansibleIntegrationTest
+    docker:
+      - image: web3f/secure-validator-ci:v1.2.6
+    steps:
+      - checkout
+      - setup_remote_docker
+      - run:
+          description: execute molecule tests for the ansible role at $ROLE_PATH
+          command: |
+            pip3 install molecule-docker
+            cd $ROLE_PATH
+            molecule test
+
+version: 2
+
+jobs:
+  unitTests:
+    docker:
+      - image: web3f/node:v0.1.2
+    steps:
+      - checkout
+      - run: yarn
+      - run:
+          name: Run tests
+          command: |
+            yarn test
+
+  axiaValidatorIntegrationTest:
+    environment:
+      ROLE_PATH: ansible/roles/axia-validator
+    <<: *ansibleIntegrationTest
+
+  nodeExporterIntegrationTest:
+    environment:
+      ROLE_PATH: ansible/roles/node-exporter
+    <<: *ansibleIntegrationTest
+  
+  updateBinaryIntegrationTest:
+    environment:
+      ROLE_PATH: ansible/roles/axia-update-binary
+    <<: *ansibleIntegrationTest  
+
+  nginxAuthIntegrationTest:
+    environment:
+      ROLE_PATH: ansible/roles/nginx-auth
+    <<: *ansibleIntegrationTest    
+
+  integrationTest:
+    docker:
+      - image: web3f/secure-validator-ci:v1.2.6
+    steps:
+      - checkout
+      - run:
+          name: Copy credentials
+          command: echo $GOOGLE_APPLICATION_CREDENTIALS_CONTENT > $(pwd)/credentials.json
+      - run:
+          name: Yarn install
+          command: yarn
+      - run:
+          name: integrationTest
+          command: ./scripts/integrationTest.sh
+
+  publishPackage:
+    docker:
+      - image: web3f/node:v0.1.2
+    steps:
+      - checkout
+      - run:
+          name: Publish package
+          command: npm publish --userconfig=.npmrc-auth
+
+workflows:
+  version: 2
+  test-deploy:
+    jobs:
+      - unitTests:
+          filters:
+            tags:
+              only: /.*/
+      - axiaValidatorIntegrationTest:
+          filters:
+            tags:
+              only: /.*/
+          requires:
+            - unitTests
+      - nodeExporterIntegrationTest:
+          filters:
+            tags:
+              only: /.*/
+          requires:
+            - unitTests
+      - updateBinaryIntegrationTest:
+          filters:
+            tags:
+              only: /.*/
+          requires:
+            - unitTests  
+      - nginxAuthIntegrationTest:
+          filters:
+            tags:
+              only: /.*/
+          requires:
+            - unitTests            
+      - integrationTest:
+          filters:
+            tags:
+              only: /.*/
+          requires:
+            - axiaValidatorIntegrationTest
+            - nodeExporterIntegrationTest
+            - updateBinaryIntegrationTest
+            - nginxAuthIntegrationTest
+      - publishPackage:
+          filters:
+            tags:
+              only: /^v(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)(?:-((?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\.(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\+([0-9a-zA-Z-]+(?:\.[0-9a-zA-Z-]+)*))?$/
+            branches:
+              ignore: /.*/
+          requires:
+            - integrationTest

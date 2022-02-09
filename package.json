@@ -1,0 +1,43 @@
+{
+  "name": "axia-secure-validator",
+  "version": "3.4.2",
+  "main": "src/index.js",
+  "repository": "https://github.com/axia-tech/axia-secure-validator",
+  "author": "W3F Infrastructure Team <devops@web3.foundation>",
+  "license": "GPL-3.0",
+  "scripts": {
+    "test": "mocha --reporter spec --recursive",
+    "sync": "node . sync",
+    "clean": "node . clean",
+    "plan": "node . plan",
+    "restore-db": "node . restore-db",
+    "rotate-keys": "node . rotate-keys",
+    "update-binary": "node . update-binary",
+    "lint": "eslint .",
+    "pretest": "yarn lint"
+  },
+  "bin": {
+    "axia-secure-validator": "src/index.js"
+  },
+  "files": [
+    "/ansible",
+    "/src",
+    "/terraform",
+    "/tpl"
+  ],
+  "dependencies": {
+    "chalk": "^2.4.2",
+    "commander": "^2.20.0",
+    "axcenv": "^8.2.0",
+    "fs-extra": "^8.1.0",
+    "handlebars": "^4.7.6",
+    "node-forge": "^0.10.0",
+    "ospath": "^1.2.2"
+  },
+  "devDependencies": {
+    "chai": "^4.2.0",
+    "eslint": "^6.6.0",
+    "mocha": "^6.2.3",
+    "tmp": "^0.1.0"
+  }
+}

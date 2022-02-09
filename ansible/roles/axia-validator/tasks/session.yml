@@ -1,0 +1,20 @@
+---
+- name: check if keys already exist
+  shell: |
+    set -o pipefail
+    if [ -d /home/axia/.local/share/axia/chains/{{ axia_network_id }}/keystore ]; then
+      ls /home/axia/.local/share/axia/chains/{{ axia_network_id }}/keystore -1U | wc -l
+    else
+      mkdir -p /home/axia/.local/share/axia/chains/{{ axia_network_id }}/
+      chown -R axia:axia /home/axia/.local/share/axia
+      echo 0
+    fi
+  args:
+    executable: /bin/bash
+  register: keystore_files
+  changed_when: False
+
+- name: initialize server keys
+  import_role:
+    name: axia-rotate-keys
+  when: keystore_files.stdout == "0"

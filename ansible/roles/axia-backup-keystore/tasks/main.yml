@@ -1,0 +1,5 @@
+- name: backup keystore
+  copy:
+    src: "/home/axia/.local/share/axia/chains/{{ axia_network_id }}/keystore"
+    dest: /home/axia/keystore
+    remote_src: yes

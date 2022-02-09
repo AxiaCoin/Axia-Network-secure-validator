@@ -1,0 +1,46 @@
+- name: get currently axia sha256
+  shell: |
+    sha256sum /usr/local/bin/axia | sed -n 's/^\(\S*\).*/sha256:\1/p'
+  args:
+    executable: /bin/bash
+  register: axia_sha256
+
+- name: download axia binary
+  get_url:
+    url: '{{ axia_binary_url | quote }}'
+    checksum: '{{ axia_binary_checksum | quote }}'
+    dest: /usr/local/bin/axia-new
+    force: true
+    mode: '0700'
+    owner: 'axia'
+    group: 'axia'
+  when: axia_sha256.stdout != axia_binary_checksum
+
+
+- name: stop axia service
+  systemd:
+    name: axia.service
+    state: stopped
+    daemon_reload: yes
+  tags: molecule-idempotence-notest
+  
+
+
+- name: substitute new axia binary
+  shell: |
+    set -o pipefail
+
+    if [ -f /usr/local/bin/axia-new ]; then
+      cp /usr/local/bin/axia-new /usr/local/bin/axia
+      chown axia:axia /usr/local/bin/axia
+      chmod 755 /usr/local/bin/axia
+    fi
+  args:
+    executable: /bin/bash
+  changed_when: False
+  when: axia_sha256.stdout != axia_binary_checksum
+
+
+- name: restart axia service
+  import_role:
+    name: axia-restart-service

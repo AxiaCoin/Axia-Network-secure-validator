@@ -1,0 +1,45 @@
+- name: Install 7z  
+  apt:
+    name: p7zip-full
+    state: present
+    update_cache: yes
+
+- name: db_dest_path as fact
+  set_fact:
+    db_dest_path: '{{ base_path }}/chains/{{ axia_network_id }}'
+  when: base_path is defined
+
+- name: db_dest_path as fact
+  set_fact:
+    db_dest_path: '/home/axia/.local/share/axia/chains/{{ axia_network_id }}'
+  when: base_path is undefined  
+
+- name: download db
+  get_url:
+    url: '{{ axia_db_snapshot_url }}'
+    checksum: '{{ axia_db_snapshot_checksum | quote }}'
+    dest: '{{ db_dest_path }}/db.new.7z'
+    mode: '0700'
+    owner: 'axia'
+    group: 'axia'  
+
+- name: stop axia service
+  systemd:
+    name: axia.service
+    state: stopped
+
+- name: unpack db
+  shell: |
+    set -o pipefail
+    cd {{ db_dest_path }}
+    mv db db.back
+    7z x db.new.7z
+    rm db.new.7z
+    chown -R axia:axia db/
+  args:
+    executable: /bin/bash
+
+- name: start axia service
+  systemd:
+    name: axia.service
+    state: started

@@ -1,0 +1,28 @@
+---
+dependency:
+  name: galaxy
+driver:
+  name: docker
+lint: |
+  set -e
+  yamllint .
+  flake8
+platforms:
+  - name: axia-validator-validator-node
+    image: ubuntu:bionic
+    groups:
+      - validator
+provisioner:
+  name: ansible
+  lint:
+    name: ansible-lint
+  inventory:
+    host_vars:
+      axia-validator-validator-node:
+        axia_network_id: axctcc3
+        axia_binary_url: 'https://github.com/axia-tech/axia/releases/download/v0.1.0/axia'
+        axia_binary_checksum: 'sha256:cdf31d39ed54e66489d1afe74ed7549d5bcdf8ff479759e8fc476d17d069901e'
+verifier:
+  name: testinfra
+  lint:
+    name: flake8

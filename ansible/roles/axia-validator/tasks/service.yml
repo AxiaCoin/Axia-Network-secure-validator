@@ -1,0 +1,24 @@
+---
+- name: cronjob for restarting axia service
+  cron:
+    name: "restart axia"
+    minute: "{{ axia_restart_minute }}"
+    hour: "{{ axia_restart_hour }}"
+    day: "{{ axia_restart_day }}"
+    month: "{{ axia_restart_month }}"
+    weekday: "{{ axia_restart_weekday }}"
+    job: "/bin/systemctl restart axia.service"
+  when: "axia_restart_enabled|default(false)|bool"
+
+- name: register public ip
+  uri:
+    url: https://api.ipify.org?format=json
+  register: public_ip
+
+- name: create axia service file
+  template:
+    src: axia.service.j2
+    dest: /etc/systemd/system/axia.service
+    owner: root
+    group: root
+    mode: 0600

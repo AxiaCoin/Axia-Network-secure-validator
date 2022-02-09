@@ -1,0 +1,11 @@
+---
+- name: create axia group
+  group:
+    name: axia
+    state: present
+
+- name: add axia user
+  user:
+    name: axia
+    group: axia
+    append: yes

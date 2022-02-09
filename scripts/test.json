@@ -1,0 +1,32 @@
+{
+  "project": "integration-test",
+  "axiaBinary": {
+    "url": "https://github.com/axia-tech/axia/releases/download/v0.1.0/axia",
+    "checksum": "sha256:7bfe10a0e46385dfb488dcc05ecffbb3075dcbd1d469e44b67a0f5d870185a05"
+  },
+  "nodeExporter": {
+    "enabled": true,
+    "binary": {
+      "url": "https://github.com/prometheus/node_exporter/releases/download/v0.18.1/node_exporter-0.18.1.linux-amd64.tar.gz",
+      "checksum": "sha256:b2503fd932f85f4e5baf161268854bf5d22001869b84f00fd2d1f57b51b72424"
+    }
+  },
+  "axiaNetworkId": "axctcc3",
+  "state": {
+    "project": "development-252112"
+  },
+  "validators": {
+    "nodes": [
+      {
+        "provider": "gcp",
+        "machineType": "n1-standard-1",
+        "count": 1,
+        "location": "us-east1",
+        "zone": "us-east1-b",
+        "projectId": "development-252112",
+        "sshUser": "axiaadmin",
+        "image": "2004"
+      }
+    ]
+  }
+}
