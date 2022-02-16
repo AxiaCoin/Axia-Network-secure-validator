@@ -54,7 +54,7 @@ The other default values from the sample inventory can be left as is.
 
 **NOTE**: Telemetry information exposes IP address, among other information. For
 this reason it's highly encouraged to use a [private telemetry
-server](https://github.com/axctech/axlib-telemetry) and not to expose the
+server](https://github.com/axiatech/axlib-telemetry) and not to expose the
 validator to a public server.
 
 ### Setup Validator
@@ -154,7 +154,7 @@ axia_restart_month='*'
 axia_restart_weekday='*'
 
 # Optional: Restore the chain db from a .7z snapshot
-axia_db_snapshot_url='https://axct-rocksdb.axcshots.io/axctest-6658753.RocksDb.7z'
+axia_db_snapshot_url='https://axct-rocksdb.axiashots.io/axctest-6658753.RocksDb.7z'
 axia_db_snapshot_checksum='sha256:4f61a99e4b00acb335aff52f2383880d53b30617c0ae67ac47c611e7bf6971ff'
 ```
 
